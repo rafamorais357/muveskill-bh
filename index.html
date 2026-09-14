@@ -80,6 +80,9 @@ dialog{border:0;padding:0;color:var(--ink);background:white;border-radius:18px;m
 @media(max-width:760px){.scopes{grid-template-columns:1.35fr 1fr 1.3fr .7fr}.scope{font-size:clamp(.68rem,2.65vw,.82rem);padding:10px 3px}.bottom-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.bottom-nav .nav-label{font-size:.68rem;white-space:nowrap}}
 
 .mobile-header .brand-tagline{white-space:normal;max-width:105px;line-height:1.35;text-align:center;font-size:.72rem;padding:0 5px;min-width:0}.mobile-header .brand{flex-shrink:0}
+
+.account-menu-actions{display:grid;gap:8px;padding:16px}.account-menu-actions button{display:flex;align-items:center;gap:12px;width:100%;padding:15px 12px;border-radius:12px;min-height:50px;text-align:left;background:var(--soft)}.account-menu-actions button span{flex:1}.account-menu-actions .logout{color:#9d3030;background:#fff3f3}.mobile-header .brand-tagline{max-width:145px;flex:1;font-size:.72rem}.mobile-header #authMobileButton{flex-shrink:0}
+@media(max-width:360px){.mobile-header{padding-left:10px;padding-right:10px}.mobile-header .brand{font-size:1.3rem}.mobile-header .brand-tagline{font-size:.66rem}}
 </style>
 </head>
 <body>
@@ -89,6 +92,7 @@ dialog{border:0;padding:0;color:var(--ink);background:white;border-radius:18px;m
 <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7.5"/><path d="m16 16 5 5"/></symbol>
 <symbol id="i-opportunity" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="4"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v3h4v-3"/></symbol>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M9 3h6l.6 3 2 .9 2.7-1 3 5.2-2.2 2 .1 2.2 2.1 2-3 5.2-2.8-.9-1.9 1L15 25H9l-.6-3.4-2-1-2.7 1-3-5.2 2.2-2-.1-2.2-2.1-2 3-5.2 2.8.9 1.9-1z" transform="translate(2 0) scale(.83)"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></symbol>
 <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="m15 8 4 4-4 4M19 12H9"/></symbol>
 <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
@@ -111,12 +115,12 @@ dialog{border:0;padding:0;color:var(--ink);background:white;border-radius:18px;m
 </svg>
 <aside class="sidebar" aria-label="Navegação principal">
  <a class="brand" href="#inicio" aria-label="MUVESKILL, início"><span class="brand-mark"><svg class="i"><use href="#i-spark"/></svg></span><span class="brand-word">muve<em>skill</em></span></a>
- <div class="city brand-tagline">A vida é uma viagem</div>
+ <div class="city brand-tagline">A vida é uma viagem — VIVA</div>
  <nav class="side-nav" id="desktopNav"></nav>
  <div class="side-bottom" id="sidebarFooter"></div>
 </aside>
 <div class="workspace">
- <header class="mobile-header"><a class="brand" href="#inicio" aria-label="MUVESKILL, início"><span class="brand-mark"><svg class="i"><use href="#i-spark"/></svg></span><span>muve<em>skill</em></span></a><span class="city brand-tagline">A vida é uma viagem</span><button class="icon-btn auth-mobile-button notification-button" id="notificationMobileButton" onclick="openNotifications()" aria-label="Notificações" hidden><svg class="i"><use href="#i-bell"/></svg></button><button class="icon-btn auth-mobile-button" id="authMobileButton" onclick="openAuthDialog()" aria-label="Entrar ou criar conta"><svg class="i"><use href="#i-user"/></svg></button></header>
+ <header class="mobile-header"><a class="brand" href="#inicio" aria-label="MUVESKILL, início"><span class="brand-mark"><svg class="i"><use href="#i-spark"/></svg></span><span>muve<em>skill</em></span></a><span class="city brand-tagline">A vida é uma viagem — VIVA</span><button class="icon-btn auth-mobile-button" id="authMobileButton" onclick="openAccountMenu()" aria-label="Abrir opções da conta" aria-haspopup="dialog"><svg class="i"><use href="#i-settings"/></svg></button></header>
  <main class="main" id="main">
   <section id="explore" aria-label="Pesquisar" hidden>
    <div class="section-head"><div><h1>Encontre sua conexão</h1><p class="muted">Busque por nome, talento ou bairro.</p></div><button class="location-trigger" id="searchLocationButton" type="button" onclick="openSearchLocation()" aria-haspopup="dialog" aria-controls="searchLocationDialog"><svg class="i"><use href="#i-pin"/></svg><span id="searchLocationLabel">Belo Horizonte, MG</span></button></div>
@@ -144,6 +148,7 @@ dialog{border:0;padding:0;color:var(--ink);background:white;border-radius:18px;m
 </dialog>
 <dialog class="photo-upload-dialog" id="photoUploadDialog" aria-labelledby="photoUploadTitle"></dialog>
 <dialog class="application-dialog" id="notificationDialog" aria-labelledby="notificationTitle"></dialog>
+<dialog class="application-dialog" id="accountMenuDialog" aria-labelledby="accountMenuTitle"></dialog>
 <dialog class="application-dialog" id="connectionsDialog" aria-labelledby="connectionsTitle"></dialog>
 <dialog class="application-dialog" id="applicationDialog" aria-labelledby="applicationTitle"></dialog>
 <dialog class="application-dialog stay-gallery-dialog" id="stayGalleryDialog" aria-labelledby="stayGalleryTitle"></dialog>
@@ -2839,6 +2844,7 @@ async function hydrateRemoteExchanges(){exchanges=[];if(!supabaseClient)return;t
 async function hydrateRemoteApplications(){remoteApplications=[];if(!supabaseClient||!authUser)return;try{const result=await supabaseClient.from('applications').select('*').or(`host_id.eq.${authUser.id},applicant_id.eq.${authUser.id}`).order('created_at',{ascending:false});if(result.error){console.warn('Não foi possível carregar as candidaturas.',result.error);return}remoteApplications=result.data||[]}catch(error){console.warn('Candidaturas indisponíveis.',error)}}
 async function hydrateRemoteFollows(){followers=[];following.clear();if(!supabaseClient||!authUser)return;try{const result=await supabaseClient.from('follows').select('follower_id,following_id,created_at').or(`follower_id.eq.${authUser.id},following_id.eq.${authUser.id}`).order('created_at',{ascending:false});if(result.error){if(!normalize(result.error.message||'').includes('does not exist'))console.warn('Seguidores indisponíveis.',result.error);return}for(const row of result.data||[]){if(row.follower_id===authUser.id)following.add(row.following_id);if(row.following_id===authUser.id)followers.push(row.follower_id)}}catch(error){console.warn('Seguidores indisponíveis.',error)}}
 function connectionPersonButton(id){const p=profiles[id];if(!p)return '';return `<button class="connection-person" onclick="document.getElementById('connectionsDialog').close();openProfile('${esc(id)}')">${image(avatarSource(p),'','',false)}<span><strong>${esc(p.name)}</strong><small>${esc(p.handle)} · ${p.type==='Hostel'?'Hospedagem':'Viajante'}</small></span></button>`}
+function openAccountMenu(){if(!authUser){openAuthDialog();return}const d=$('accountMenuDialog');d.innerHTML=`<div class="dialog-header"><strong id="accountMenuTitle">Minha conta</strong><button class="icon-btn" onclick="document.getElementById('accountMenuDialog').close()" aria-label="Fechar">${icon('close')}</button></div><div class="account-menu-actions"><button onclick="document.getElementById('accountMenuDialog').close();openConnections('followers')">${icon('user')}<span>Seguidores</span><strong>${followers.length}</strong>${icon('arrow')}</button><button onclick="document.getElementById('accountMenuDialog').close();openConnections('following')">${icon('user')}<span>Seguindo</span><strong>${[...following].filter(id=>profiles[id]).length}</strong>${icon('arrow')}</button><button class="logout" onclick="document.getElementById('accountMenuDialog').close();signOutUser()">${icon('logout')}<span>Sair da conta</span></button></div>`;if(!d.open)d.showModal()}
 function openConnections(kind='followers'){if(!authUser)return;const ids=kind==='followers'?followers:[...following].filter(id=>profiles[id]);const d=$('connectionsDialog'),title=kind==='followers'?'Quem segue você':'Quem você segue';d.innerHTML=`<div class="dialog-header"><strong id="connectionsTitle">${title}</strong><button class="icon-btn" onclick="document.getElementById('connectionsDialog').close()" aria-label="Fechar">${icon('close')}</button></div><div class="connection-list">${ids.length?ids.map(connectionPersonButton).join(''):`<div class="empty"><p>${kind==='followers'?'Ninguém começou a seguir você ainda.':'Você ainda não segue nenhum perfil.'}</p></div>`}</div>`;if(!d.open)d.showModal()}
 async function createExchangeNotification(targetId,type,message,data={}){if(!supabaseClient||!authUser||!targetId||targetId===authUser.id)return;try{const result=await supabaseClient.from('notifications').insert({recipient_id:targetId,actor_id:authUser.id,type,message,data});if(result.error)console.warn('Notificação de vivência não enviada.',result.error)}catch(error){console.warn('Notificação de vivência indisponível.',error)}}
 async function rejectApplication(applicationId){if(!supabaseClient||!authUser||!isCurrentHost())return;const a=remoteApplications.find(row=>String(row.id)===String(applicationId)&&row.host_id===CURRENT_USER_ID);if(!a)return;try{const result=await supabaseClient.from('applications').update({status:'cancelled'}).eq('id',applicationId).eq('host_id',CURRENT_USER_ID);if(result.error)throw result.error;await createExchangeNotification(a.applicant_id,'application_rejected',`${profiles[CURRENT_USER_ID]?.name||'A hospedagem'} não deu andamento à sua candidatura desta vez.`,{application_id:a.id,mission_id:a.mission_id});await hydrateRemoteApplications();renderHostCandidaturas();toast('Candidatura encerrada')}catch(error){console.warn(error);toast('Não foi possível atualizar a candidatura.')}}
@@ -2917,15 +2923,10 @@ function refreshChrome(){
    : '<div class="auth-panel"><p>Crie seu perfil para mostrar seus talentos e participar das oportunidades.</p><button class="btn btn-outline" onclick="openAuthDialog(\'signup\')">Criar perfil</button><button class="btn btn-quiet" style="margin-top:7px" onclick="openAuthDialog(\'login\')">Já tenho conta</button></div>';
  const mobile=$('authMobileButton');
  if(mobile){
-   mobile.innerHTML=authSession?icon('check'):icon('user');
-   mobile.setAttribute('aria-label',authSession?'Abrir conta conectada':'Entrar ou criar conta');
+   mobile.innerHTML=icon('settings');
+   mobile.setAttribute('aria-label','Abrir opções da conta');
  }
- const notifyMobile=$('notificationMobileButton');
- if(notifyMobile){
-   notifyMobile.hidden=!(authSession&&authUser);
-   const count=unreadNotificationCount();
-   notifyMobile.innerHTML=icon('bell')+(count?`<span class="notification-badge">${count>9?'9+':count}</span>`:'');
- }
+
 }
 function supabaseConfig(){const config=typeof window!=='undefined'&&window.MUVESKILL_SUPABASE_CONFIG?window.MUVESKILL_SUPABASE_CONFIG:{};return {url:String(config.url||config.supabaseUrl||'').trim().replace(/\/$/,''),anonKey:String(config.anonKey||config.anon_key||'').trim()}}
 function isSupabaseConfigured(){const config=supabaseConfig();return /^https?:\/\/.+/i.test(config.url)&&config.anonKey.length>20&&!/(service_role|sb_secret)/i.test(config.anonKey)}
