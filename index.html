@@ -3259,6 +3259,15 @@ function setupSimpleOpportunity(){
  if(input&&!input.value&&vals){const known=[...form.querySelectorAll('[name="'+n+'Choice"]')].map(x=>x.value);input.value=vals.filter(v=>!known.includes(v)).join(', ');}
  if(toggle){toggle.name=n+'OtherEnabled';$('manage-'+n+'OtherWrap').hidden=!toggle.checked;input.required=toggle.checked;}
  });
+ const arrivalField=$('manage-arrival');arrivalField.required=false;generated.append(arrivalField.closest('.manage-field'));
+ {const paymentWhen=$('manage-paymentWhen'),timing=document.createElement('select');
+ timing.id='paymentTiming';timing.name='paymentTiming';
+ const timingOptions=['Metade antes do início e metade ao término da vivência','Ao término da vivência','Antes do início da vivência','Semanalmente durante a vivência','A combinar','Outros'];
+ timingOptions.forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;timing.append(option);});
+ timing.value=timingOptions.includes(draft?.values?.paymentTiming)?draft.values.paymentTiming:paymentWhen.value?(timingOptions.includes(paymentWhen.value)?paymentWhen.value:'Outros'):'A combinar';
+ paymentWhen.before(timing);paymentWhen.closest('.manage-field').querySelector('label').htmlFor=timing.id;
+ paymentWhen.placeholder='Descreva quando será pago';paymentWhen.setAttribute('aria-label','Outro combinado de pagamento');
+ timing.addEventListener('change',()=>{if(timing.value==='Outros')paymentWhen.value='';});}
  form.noValidate=true;
  // Expanding an option should not move the host away from that option.
  form.addEventListener('input',event=>{
@@ -3282,8 +3291,9 @@ function syncSimpleOpportunity(){
  const get=n=>$('manage-'+n),model=get('exchangeType').value,paid=model!=='Permuta';
  const toggle=(n,visible)=>{const el=get(n);if(!el)return;el.closest('.manage-field').hidden=!visible;el.disabled=!visible;};
  ['paymentAmount','paymentMethod','paymentWhen'].forEach(n=>toggle(n,paid));get('paymentAmount').required=paid;get('paymentAmount').min='1';
+ const timing=$('paymentTiming');if(timing){timing.disabled=!paid;const custom=timing.value==='Outros';get('paymentWhen').hidden=!custom;get('paymentWhen').required=paid&&custom;if(!custom)get('paymentWhen').value=timing.value;}
  const hasStay=!!form.querySelector('[name="benefitsChoice"][value="stay"]:checked');
- ['room','occupancy','bathroom','stayLocation','stayIncluded','arrival'].forEach(n=>toggle(n,hasStay));
+ ['room','occupancy','bathroom','stayLocation','stayIncluded'].forEach(n=>toggle(n,hasStay));
  $('opportunityStayPhotos').closest('.stay-upload').hidden=!hasStay;
  const days=Number(get('projectDays').value)||0;
  toggle('daysOffPerWeek',days>=7);toggle('shortFreeDays',days<7);get('shortFreeDays').max=Math.max(0,days-1);
