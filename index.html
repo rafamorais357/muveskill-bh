@@ -3260,6 +3260,7 @@ function setupSimpleOpportunity(){
  if(toggle){toggle.name=n+'OtherEnabled';$('manage-'+n+'OtherWrap').hidden=!toggle.checked;input.required=toggle.checked;}
  });
  const arrivalField=$('manage-arrival');arrivalField.required=false;generated.append(arrivalField.closest('.manage-field'));
+ const occupancyField=$('manage-occupancy');occupancyField.required=false;occupancyField.value='';generated.append(occupancyField.closest('.manage-field'));
  {const paymentWhen=$('manage-paymentWhen'),timing=document.createElement('select');
  timing.id='paymentTiming';timing.name='paymentTiming';
  const timingOptions=['Metade antes do início e metade ao término da vivência','Ao término da vivência','Antes do início da vivência','Semanalmente durante a vivência','A combinar','Outros'];
@@ -3293,7 +3294,7 @@ function syncSimpleOpportunity(){
  ['paymentAmount','paymentMethod','paymentWhen'].forEach(n=>toggle(n,paid));get('paymentAmount').required=paid;get('paymentAmount').min='1';
  const timing=$('paymentTiming');if(timing){timing.disabled=!paid;const custom=timing.value==='Outros';get('paymentWhen').hidden=!custom;get('paymentWhen').required=paid&&custom;if(!custom)get('paymentWhen').value=timing.value;}
  const hasStay=!!form.querySelector('[name="benefitsChoice"][value="stay"]:checked');
- ['room','occupancy','bathroom','stayLocation','stayIncluded'].forEach(n=>toggle(n,hasStay));
+ ['room','bathroom','stayLocation','stayIncluded'].forEach(n=>toggle(n,hasStay));
  $('opportunityStayPhotos').closest('.stay-upload').hidden=!hasStay;
  const days=Number(get('projectDays').value)||0;
  toggle('daysOffPerWeek',days>=7);toggle('shortFreeDays',days<7);get('shortFreeDays').max=Math.max(0,days-1);
