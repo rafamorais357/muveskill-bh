@@ -3228,7 +3228,7 @@ function setupSimpleOpportunity(){
  const calculation=document.createElement('p');calculation.id='simpleRoutine';calculation.className='exchange-live-summary wide';steps[1].append(calculation);
  const timing=document.createElement('div');timing.className='manage-field wide';timing.innerHTML='<label for="simpleDateMode">Chegada e saída</label><select id="simpleDateMode" name="dateMode"><option value="combine">A combinar antes da confirmação</option><option value="dates">Definir datas</option></select>';steps[1].append(timing);
  steps[1].insertAdjacentHTML('beforeend',manageInput('startDate','Data de chegada',draft?.values?.startDate||'','',false,false,'date')+manageInput('endDate','Data de saída',draft?.values?.endDate||'','',false,false,'date'));
- const skills=form.querySelector('[name="missionSkillChoice"]')?.closest('.manage-choice-list');if(skills)steps[2].insertBefore(skills,extra);
+ const skills=form.querySelector('[name="missionSkillChoice"]')?.closest('.manage-choice-list');if(skills){skills.classList.add('skills-full-width');steps[2].insertBefore(skills,extra);}
  ['missionTitle','missionDescription','tasks','deliverables'].forEach(n=>{const el=move(n,steps[2]);if(el){steps[2].insertBefore(el.closest('.manage-field'),extra);if(n==='deliverables')el.required=false;}});
  const cover=$('opportunityCoverPhoto')?.closest('.stay-upload');if(cover)steps[2].insertBefore(cover,extra);
  ['requirements','provided','costs','agreements','responsible','rules','cancellation','imageUse','moveSupport','mealNote','mealNotIncluded','schedule','rest'].forEach(n=>{const el=move(n,extraGrid);if(el)el.required=false;});
@@ -3252,9 +3252,8 @@ function setupSimpleOpportunity(){
  });
  // Restore custom option text, including choices in existing opportunities.
  const mission=missions.find(m=>m.id===managementMissionId);
- const bring=getBringOptions();
- if(!mission&&!draft)$('manage-requirements').value='Um coração aberto para doar e receber.';
- function getBringOptions(){const input=$('manage-requirements'),box=input.closest('.manage-field');steps[2].insertBefore(box,extra);input.placeholder='Outros itens ou requisitos: escreva aqui.';const choices=document.createElement('div');choices.className='manage-choice-grid';['Equipamento de fotografia','Notebook','Roupas adequadas para a atividade','Calçado fechado','Itens de uso pessoal'].forEach(label=>{const button=document.createElement('button');button.type='button';button.className='btn btn-secondary';button.textContent='+ '+label;button.onclick=()=>{const lines=input.value.split('\n').filter(Boolean);if(!lines.includes(label))lines.push(label);input.value=lines.join('\n');input.dispatchEvent(new Event('input',{bubbles:true}));};choices.append(button);});input.before(choices);return choices;}
+ // Keep existing published requirements intact, without showing an editing field.
+ const requirements=$('manage-requirements');requirements.required=false;generated.append(requirements.closest('.manage-field'));
  [['missionSkill',mission?.skills],['benefits',mission?.details?.benefits]].forEach(([n,vals])=>{
  const input=$('manage-'+n+'Other'),toggle=$('manage-'+n+'OtherToggle');
  if(input&&!input.value&&vals){const known=[...form.querySelectorAll('[name="'+n+'Choice"]')].map(x=>x.value);input.value=vals.filter(v=>!known.includes(v)).join(', ');}
@@ -3332,6 +3331,21 @@ const optionStyle=document.createElement('style');optionStyle.textContent=`
 @media(hover:hover){#management .manage-choice-grid label:hover,#management .manage-choice-grid>.btn:hover{border-color:#a68bd3;background:#f8f4ff}}
 @media(max-width:600px){#management .manage-choice-list{padding:16px 12px}#management .manage-choice-grid{gap:10px}#management .manage-choice-grid label,#management .manage-choice-grid>.btn{padding:12px;gap:9px;font-size:.84rem}}
 @media(max-width:380px){#management .manage-choice-grid{grid-template-columns:1fr}}
+#management .management-form{font-size:1rem;line-height:1.5}
+#management .management-form input,#management .management-form textarea,#management .management-form select,#management .management-form button{font-family:inherit;font-size:1rem;line-height:1.5}
+#management .manage-field>label,#management .manage-choice-list legend,#management .manage-choice-grid label,#management .manage-choice-grid>.btn{font-size:1rem;line-height:1.5;font-weight:500}
+#management .management-step>legend{font-size:1.25rem;line-height:1.4;font-weight:700}
+#management .wizard-step-copy,#management .manage-choice-help,#management .manage-help{font-size:.875rem;line-height:1.6}
+#management .skills-full-width{grid-column:1/-1;width:100%;padding:16px 0;border:0;background:transparent;box-sizing:border-box;text-align:center}
+#management .skills-full-width legend{float:none;width:100%;padding:0;text-align:center;font-weight:600}
+#management .skills-full-width .manage-choice-grid{grid-template-columns:minmax(0,1fr);width:100%;gap:10px}
+#management .skills-full-width .manage-choice-grid label{position:relative;justify-content:center;text-align:center;min-height:50px;border:0;box-shadow:none;background:#f3f1f7;color:#51495e;font-weight:500}
+#management .skills-full-width .manage-choice-grid label:has(input:checked){border:0;box-shadow:none;background:var(--accent);color:#fff;font-weight:500}
+#management .skills-full-width .manage-choice-grid label:hover{border:0}
+#management .skills-full-width .manage-choice-grid label:not(:has(input:checked)):hover{background:#eae4f4}
+#management .skills-full-width .manage-choice-grid input[type="checkbox"]{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+#management .skills-full-width .manage-choice-grid label:focus-within{outline:none}
+#management .skills-full-width .manage-choice-grid label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
 `;document.head.append(optionStyle);
 if($('managementForm'))setupSimpleOpportunity();
 </script>
