@@ -3178,10 +3178,130 @@ setupSidebarScrollIsolation();
 window.addEventListener('hashchange',()=>{document.querySelectorAll('dialog[open]').forEach(d=>d.close());renderRoute()});renderHome();renderRoute();initAuth();
 </script>
 </body>
-</html>
-
 <script>
-const intuitiveManagementStyle=document.createElement('style');intuitiveManagementStyle.textContent='.management-essential-note{display:flex;flex-direction:column;gap:4px;margin:12px 0 20px;padding:14px 16px;border-radius:14px;background:#f6f1ff;color:#5f35c9}.management-essential-note span{font-size:.9rem;color:#6b6876}.management-step legend{font-weight:750}';document.head.appendChild(intuitiveManagementStyle);
-function applyManagementIntuitiveLabels(){const steps=[['O que a pessoa recebe','Comece pelos benefícios: hospedagem, alimentação, duração, folgas e eventual ajuda de custo.'],['O que a pessoa vai fazer','Depois, explique as tarefas, entregas e como serão os dias de atividade e descanso.'],['Onde a pessoa vai ficar','Confirme o local, o tipo de quarto e as noites incluídas na vivência.'],['Alimentação e pagamento','Marque o que está incluído e informe o valor apenas se houver.'],['Detalhes importantes','Inclua somente requisitos, responsabilidades e regras que fazem diferença.'],['Revisar e publicar','Confira o resumo completo antes de publicar.']];document.querySelectorAll('.management-step').forEach((step,i)=>{const legend=step.querySelector('legend'),copy=step.querySelector('.wizard-step-copy');if(legend&&steps[i])legend.textContent=steps[i][0];if(copy&&steps[i])copy.textContent=steps[i][1]});const intro=document.querySelector('.management-intro p');if(intro)intro.textContent='Preencha primeiro o que o viajante recebe. Depois, descreva o que ele vai fazer — só o que for essencial para combinar a troca.';const first=document.querySelector('.management-step[data-step="0"]');if(first&&!first.querySelector('.management-essential-note')){const note=document.createElement('div');note.className='management-essential-note';note.innerHTML='<strong>Ordem simples</strong><span>1. O que recebe&nbsp;&nbsp; 2. O que faz&nbsp;&nbsp; 3. Onde fica&nbsp;&nbsp; 4. Revisar</span>';first.querySelector('.wizard-step-copy')?.after(note)}}
-const managementLabelObserver=new MutationObserver(()=>{if(document.querySelector('.management-step'))applyManagementIntuitiveLabels()});managementLabelObserver.observe(document.body,{childList:true,subtree:true});
+// Four-step editor: keep existing publishing fields and data contracts.
+const legacyManagementRender = renderManagement;
+renderManagement = function(){legacyManagementRender();if($('managementForm'))setupSimpleOpportunity();};
+managementStepLabels = ()=>['O que oferece','Como será','Qual ajuda','Revisar'];
+saveOpportunityDraft = function(form){
+ if(!form||!managementHostId)return;
+ const values={},checks={};
+ form.querySelectorAll('input,textarea,select').forEach(el=>{
+  if(el.type==='file')return;
+  if(el.type==='checkbox'){checks[el.id||el.name+':'+el.value]=el.checked;return;}
+  if(el.name)values[el.name]=el.value;
+ });
+ storageWrite(opportunityDraftKey(),{values,checks,step:managementStep,layout:2,updatedAt:new Date().toISOString()});
+};
+restoreOpportunityDraft = function(form){
+ const draft=loadOpportunityDraft();
+ if(draft)form.querySelectorAll('input,textarea,select').forEach(el=>{
+  if(el.type==='file')return;
+  if(el.type==='checkbox'){const key=el.id||el.name+':'+el.value;if(draft.checks&&key in draft.checks)el.checked=draft.checks[key];}
+  else if(el.name&&draft.values[el.name]!==undefined)el.value=String(draft.values[el.name]);
+ });
+};
+syncOpportunityStayLength = function(){
+ const f=$('managementForm');if(!f)return;
+ const days=Number($('manage-projectDays')?.value)||0,weekly=Number($('manage-daysOffPerWeek')?.value)||0;
+ const short=$('manage-shortFreeDays');
+ const free=days<7?Math.min(Math.max(0,days-1),Number(short?.value)||0):Math.floor(days/7)*weekly;
+ if($('manage-freeDays'))$('manage-freeDays').value=free;
+ if($('manage-activityDays'))$('manage-activityDays').value=Math.max(1,days-free);
+ const stay=f.querySelector('[name="benefitsChoice"][value="stay"]');
+ if($('manage-nights'))$('manage-nights').value=stay?.checked?days:0;
+};
+function setupSimpleOpportunity(){
+ const form=$('managementForm'),old=[...form.querySelectorAll('.management-step')],draft=loadOpportunityDraft();
+ const titles=['O que você oferece?','Como será a vivência?','Qual ajuda você precisa?','Confira sua oportunidade'];
+ const copy=['Marque os benefícios. Os detalhes aparecem conforme suas escolhas.','Informe a duração, as horas e o descanso. Fazemos as contas para você.','Conte o que será feito. Use os exemplos como orientação.','Veja a proposta antes de criar. Você pode voltar e editar qualquer etapa.'];
+ const steps=titles.map((title,i)=>{const box=document.createElement('fieldset');box.className='management-step';box.dataset.step=i;box.innerHTML='<legend>'+title+'</legend><p class="wizard-step-copy">'+copy[i]+'</p>';return box;});
+ const move=(name,to)=>{const el=$('manage-'+name);const box=el?.closest('.manage-field');if(box)to.append(box);return el;};
+ const extra=document.createElement('details');extra.className='wide simple-extra';extra.innerHTML='<summary>Adicionar detalhes importantes (opcional)</summary><div class="simple-extra-grid"></div>';steps[2].append(extra);const extraGrid=extra.lastElementChild;
+ move('exchangeType',steps[0]);
+ const hint=document.createElement('p');hint.className='manage-help wide';hint.textContent='Permuta: benefícios sem dinheiro. Remunerada: pagamento pelo projeto. Híbrida: benefícios + pagamento.';steps[0].append(hint);
+ const benefits=form.querySelector('[name="benefitsChoice"]')?.closest('.manage-choice-list');if(benefits)steps[0].append(benefits);
+ ['paymentAmount','paymentMethod','paymentWhen','room','occupancy','bathroom','stayLocation','stayIncluded','arrival'].forEach(n=>move(n,steps[0]));
+ const photos=$('opportunityStayPhotos')?.closest('.stay-upload');if(photos)steps[0].append(photos);
+ ['projectDays','hoursPerDay','daysOffPerWeek'].forEach(n=>move(n,steps[1]));
+ steps[1].insertAdjacentHTML('beforeend',manageInput('shortFreeDays','Quantos dias de folga no total?',draft?.values?.shortFreeDays||0,'Ex.: 1',false,true,'number','min="0" step="1"'));
+ const calculation=document.createElement('p');calculation.id='simpleRoutine';calculation.className='exchange-live-summary wide';steps[1].append(calculation);
+ const timing=document.createElement('div');timing.className='manage-field wide';timing.innerHTML='<label for="simpleDateMode">Chegada e saída</label><select id="simpleDateMode" name="dateMode"><option value="combine">A combinar antes da confirmação</option><option value="dates">Definir datas</option></select>';steps[1].append(timing);
+ steps[1].insertAdjacentHTML('beforeend',manageInput('startDate','Data de chegada',draft?.values?.startDate||'','',false,false,'date')+manageInput('endDate','Data de saída',draft?.values?.endDate||'','',false,false,'date'));
+ const skills=form.querySelector('[name="missionSkillChoice"]')?.closest('.manage-choice-list');if(skills)steps[2].insertBefore(skills,extra);
+ ['missionTitle','missionDescription','tasks','deliverables'].forEach(n=>{const el=move(n,steps[2]);if(el){steps[2].insertBefore(el.closest('.manage-field'),extra);if(n==='deliverables')el.required=false;}});
+ const cover=$('opportunityCoverPhoto')?.closest('.stay-upload');if(cover)steps[2].insertBefore(cover,extra);
+ ['requirements','provided','costs','agreements','responsible','rules','cancellation','imageUse','moveSupport','mealNote','mealNotIncluded','schedule','rest'].forEach(n=>{const el=move(n,extraGrid);if(el)el.required=false;});
+ steps[3].append($('managementPreview'));
+ // Keep generated values in the form without asking the host to repeat them.
+ const generated=document.createElement('div');generated.hidden=true;
+ ['missionReward','missionDeadline','mealSummary','mealIncluded','nights','activityDays','freeDays','dates'].forEach(n=>{const el=move(n,generated);if(el){el.required=false;el.readOnly=true;}});
+ const summary=form.querySelector(':scope > .exchange-live-summary');old.forEach(box=>box.remove());steps.forEach(box=>form.insertBefore(box,summary));form.append(generated);
+ if(draft?.values?.dateMode)$('simpleDateMode').value=draft.values.dateMode;
+ managementStep=draft?.layout===2?Math.min(3,draft.step||0):0;
+ const relabel=(n,t)=>{$('manage-'+n)?.closest('.manage-field')?.querySelector('label')?.replaceChildren(document.createTextNode(t));};
+ relabel('projectDays','Quantos dias dura a vivência?');relabel('hoursPerDay','Até quantas horas por dia?');relabel('paymentAmount','Valor total pelo projeto (R$)');relabel('stayIncluded','Bônus da estadia (opcional)');$('manage-stayIncluded').required=false;
+ $('manage-tasks').placeholder='Ex.: Fotografar os quartos e áreas comuns e editar as imagens selecionadas.';
+ $('manage-deliverables').placeholder='Ex.: 20 fotos editadas e 2 vídeos. Deixe vazio se não houver entregas específicas.';
+ $('manage-missionDescription').placeholder='Ex.: Queremos renovar as fotos da pousada e mostrar nossa experiência aos futuros hóspedes.';
+ ['room','bathroom'].forEach(n=>{
+ const input=$('manage-'+n),options=n==='room'?['Quarto compartilhado','Quarto privativo','Outros']:['Banheiro compartilhado','Banheiro privativo','Outros'];
+ const select=document.createElement('select');select.id='simple-'+n;select.name=n+'Option';select.innerHTML=options.map(v=>'<option>'+v+'</option>').join('');
+ select.value=options.includes(input.value)?input.value:'Outros';input.before(select);
+ const change=()=>{input.hidden=select.value!=='Outros';if(!input.hidden){input.placeholder='Descreva a opção';}else input.value=select.value;};select.addEventListener('change',()=>{if(select.value==='Outros')input.value='';change();});change();
+ });
+ // Restore custom option text, including choices in existing opportunities.
+ const mission=missions.find(m=>m.id===managementMissionId);
+ const bring=getBringOptions();
+ function getBringOptions(){const input=$('manage-requirements'),box=input.closest('.manage-field');steps[2].insertBefore(box,extra);input.placeholder='Outros itens ou requisitos: escreva aqui.';const choices=document.createElement('div');choices.className='manage-choice-grid';['Equipamento de fotografia','Notebook','Roupas adequadas para a atividade','Calçado fechado','Itens de uso pessoal'].forEach(label=>{const button=document.createElement('button');button.type='button';button.className='btn btn-secondary';button.textContent='+ '+label;button.onclick=()=>{const lines=input.value.split('\n').filter(Boolean);if(!lines.includes(label))lines.push(label);input.value=lines.join('\n');input.dispatchEvent(new Event('input',{bubbles:true}));};choices.append(button);});input.before(choices);return choices;}
+ [['missionSkill',mission?.skills],['benefits',mission?.details?.benefits]].forEach(([n,vals])=>{
+ const input=$('manage-'+n+'Other'),toggle=$('manage-'+n+'OtherToggle');
+ if(input&&!input.value&&vals){const known=[...form.querySelectorAll('[name="'+n+'Choice"]')].map(x=>x.value);input.value=vals.filter(v=>!known.includes(v)).join(', ');}
+ if(toggle){toggle.name=n+'OtherEnabled';$('manage-'+n+'OtherWrap').hidden=!toggle.checked;input.required=toggle.checked;}
+ });
+ form.noValidate=true;
+ const intro=document.querySelector('.management-intro p');if(intro)intro.textContent='Quatro etapas rápidas. Seu rascunho de texto e opções fica salvo neste navegador; publique apenas quando estiver pronto.';
+ form.addEventListener('input',()=>{syncSimpleOpportunity();saveOpportunityDraft(form);});
+ form.addEventListener('change',()=>{syncSimpleOpportunity();saveOpportunityDraft(form);});
+ syncSimpleOpportunity();updateManagementSteps();$('wizardPublish').textContent=managementMissionId?'Salvar alterações':'Criar oportunidade';
+}
+function syncSimpleOpportunity(){
+ const form=$('managementForm');if(!form||!$('simpleDateMode'))return;
+ const get=n=>$('manage-'+n),model=get('exchangeType').value,paid=model!=='Permuta';
+ const toggle=(n,visible)=>{const el=get(n);if(!el)return;el.closest('.manage-field').hidden=!visible;el.disabled=!visible;};
+ ['paymentAmount','paymentMethod','paymentWhen'].forEach(n=>toggle(n,paid));get('paymentAmount').required=paid;get('paymentAmount').min='1';
+ const hasStay=!!form.querySelector('[name="benefitsChoice"][value="stay"]:checked');
+ ['room','occupancy','bathroom','stayLocation','stayIncluded','arrival'].forEach(n=>toggle(n,hasStay));
+ $('opportunityStayPhotos').closest('.stay-upload').hidden=!hasStay;
+ const days=Number(get('projectDays').value)||0;
+ toggle('daysOffPerWeek',days>=7);toggle('shortFreeDays',days<7);get('shortFreeDays').max=Math.max(0,days-1);
+ const dated=$('simpleDateMode').value==='dates';['startDate','endDate'].forEach(n=>{toggle(n,dated);get(n).required=dated;});
+ get('endDate').min=get('startDate').value;get('endDate').setCustomValidity(dated&&get('endDate').value&&get('endDate').value<get('startDate').value?'A saída deve ser depois da chegada.':'');
+ syncOpportunityStayLength();
+ const data=new FormData(form),selected=readManageChoices(data,'benefits'),labels={breakfast:'Café da manhã',lunch:'Almoço',dinner:'Jantar',materials:'Materiais de trabalho',transport:'Transporte local',stipend:'Ajuda de custo'};
+ const meals=selected.filter(v=>['breakfast','lunch','dinner'].includes(v)).map(v=>labels[v]);
+ get('mealIncluded').value=meals.join('\n');get('mealSummary').value=meals.length?meals.join(' + '):'Alimentação não incluída';
+ const reward=selected.filter(v=>v!=='stipend').map(v=>v==='stay'?days+' noites':labels[v]||v);
+ if(paid&&Number(get('paymentAmount').value)>0)reward.push('R$ '+get('paymentAmount').value+' via '+get('paymentMethod').value);
+ get('missionReward').value=reward.join(' + ');get('missionDeadline').value=days+' dias';
+ get('dates').value=dated?'Chegada: '+get('startDate').value+' · Saída: '+get('endDate').value:'Chegada e saída combinadas antes da confirmação.';
+ if(hasStay)get('arrival').value=get('dates').value;
+ const free=Number(get('freeDays').value),active=Number(get('activityDays').value);
+ $('simpleRoutine').textContent=days+' dias de vivência · '+active+' dias de atividades · '+free+' dias de folga'+(days>=7?' ('+get('daysOffPerWeek').value+' por semana completa; dias restantes com atividades)':'')+'.'+(hasStay?' '+days+' noites incluídas.':' Sem hospedagem incluída.');
+ $('exchangeLiveSummaryText').textContent=(get('missionReward').value||'Selecione os benefícios da troca')+' · Até '+get('hoursPerDay').value+'h por dia · '+free+' dias de folga no período.';
+ const skill=form.querySelector('[name="missionSkillChoice"]');if(skill)skill.setCustomValidity(readManageChoices(data,'missionSkill').length?'':'Selecione pelo menos um talento.');
+ const first=form.querySelector('[name="benefitsChoice"]');if(first)first.setCustomValidity(model!=='Remunerada'&&!selected.length?'Selecione pelo menos um benefício.':'');
+}
+validateManagementStep = function(step){
+ const box=$('managementForm')?.querySelector('.management-step[data-step="'+step+'"]');if(!box)return true;
+ for(const el of box.querySelectorAll('input,textarea,select'))if(!el.disabled&&!el.checkValidity()){
+ managementStep=step;updateManagementSteps();const details=el.closest('details');if(details)details.open=true;el.reportValidity();el.focus();return false;}return true;
+};
+renderManagementPreview = function(){
+ const root=$('managementPreview');if(!root)return;syncSimpleOpportunity();
+ const v=n=>esc(managementFieldValue(n));
+ root.innerHTML='<div class="exchange-live-summary"><strong>🎁 '+v('missionReward')+'</strong><p>'+v('projectDays')+' dias · Até '+v('hoursPerDay')+'h/dia · '+v('freeDays')+' dias de folga</p><button type="button" class="btn btn-secondary" onclick="manageJumpStep(0)">Editar benefícios</button></div><h3>'+v('missionTitle')+'</h3><p>'+v('missionDescription')+'</p><h4>Onde fica</h4><p>'+(Number(managementFieldValue('nights'))?v('room')+' · '+v('bathroom')+' · '+v('stayLocation'):'Sem hospedagem incluída')+'</p><h4>O que vai fazer</h4><p style="white-space:pre-line">'+v('tasks')+'</p><h4>Entregas combinadas</h4><p style="white-space:pre-line">'+(v('deliverables')||'Sem entregas específicas.')+'</p><button type="button" class="btn btn-secondary" onclick="manageJumpStep(2)">Editar atividades</button>';
+};
+const simpleStyle=document.createElement('style');simpleStyle.textContent='.management-form [hidden]{display:none!important}.simple-extra{grid-column:1/-1;border:1px solid #e9e4f1;border-radius:16px;padding:16px}.simple-extra summary{cursor:pointer;color:#7336db;font-weight:650}.simple-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}.wizard-progress{display:flex;flex-wrap:wrap;gap:8px}.wizard-dot{flex:1;min-width:110px}.management-step>.exchange-live-summary{grid-column:1/-1} @media(max-width:600px){.simple-extra-grid{grid-template-columns:1fr}.wizard-dot{min-width:40%;font-size:12px}}';document.head.append(simpleStyle);
+if($('managementForm'))setupSimpleOpportunity();
 </script>
