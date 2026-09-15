@@ -3336,7 +3336,8 @@ const optionStyle=document.createElement('style');optionStyle.textContent=`
 #management .manage-choice-grid label span{min-width:0;overflow-wrap:anywhere}
 #management .manage-choice-grid input[type="checkbox"]{flex:0 0 19px;width:19px;height:19px;min-height:0;padding:0;margin:0}
 #management .manage-choice-grid label:has(input:checked){background:#f2ebff;border-color:var(--accent);color:var(--accent);font-weight:600}
-#management .manage-choice-grid label:focus-within,#management .manage-choice-grid>.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#management .manage-choice-grid label:focus-within{outline:none;box-shadow:none}
+#management .manage-choice-grid>.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 #management .manage-field>label{line-height:1.5;margin-bottom:8px}
 #management .manage-field select{min-height:48px;border-radius:12px}
 @media(hover:hover){#management .manage-choice-grid label:hover,#management .manage-choice-grid>.btn:hover{border-color:#a68bd3;background:#f8f4ff}}
@@ -3357,7 +3358,7 @@ const optionStyle=document.createElement('style');optionStyle.textContent=`
 #management .skills-full-width .manage-choice-grid label:not(:has(input:checked)):hover{background:#faf7ff;border-color:#baa5df}
 #management .skills-full-width .manage-choice-grid input[type="checkbox"]{position:static;flex:0 0 20px;width:20px;height:20px;clip-path:none;overflow:visible;padding:0;margin:0;accent-color:var(--accent)}
 #management .skills-full-width .manage-choice-grid label:focus-within{outline:none}
-#management .skills-full-width .manage-choice-grid label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
+#management .skills-full-width .manage-choice-grid label:has(input:focus-visible){outline:none;box-shadow:none}
 @media(max-width:380px){#management .skills-full-width .manage-choice-grid{grid-template-columns:1fr}}
 `;document.head.append(optionStyle);
 if($('managementForm'))setupSimpleOpportunity();
@@ -3396,7 +3397,7 @@ if($('managementForm'))setupSimpleOpportunity();
 #management .manage-choice-grid label,#management .skills-full-width .manage-choice-grid label{font-size:.9375rem;font-weight:600;border:1px solid transparent;background:#f3f0f7;border-radius:13px;padding:14px;min-height:56px;gap:10px}
 #management .manage-choice-grid label:has(input:checked),#management .skills-full-width .manage-choice-grid label:has(input:checked){background:#eadeff;color:#5523a3;border-color:transparent;font-weight:700}
 #management .skills-full-width .manage-choice-grid label:not(:has(input:checked)):hover{background:#eee8f6;border-color:transparent}
-#management .manage-choice-grid label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
+#management .manage-choice-grid label:has(input:focus-visible){outline:none;box-shadow:none}
 #management .wizard-progress{gap:8px;padding-bottom:20px;margin-bottom:8px}
 #management .wizard-dot{border:0;border-radius:12px;padding:12px 10px;font-family:inherit;font-size:.8125rem;line-height:1.45;background:#f3f0f7;color:#676070;font-weight:700}
 #management .wizard-dot.active{background:var(--accent);color:white}
