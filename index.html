@@ -3336,16 +3336,18 @@ const optionStyle=document.createElement('style');optionStyle.textContent=`
 #management .manage-field>label,#management .manage-choice-list legend,#management .manage-choice-grid label,#management .manage-choice-grid>.btn{font-size:1rem;line-height:1.5;font-weight:500}
 #management .management-step>legend{font-size:1.25rem;line-height:1.4;font-weight:700}
 #management .wizard-step-copy,#management .manage-choice-help,#management .manage-help{font-size:.875rem;line-height:1.6}
-#management .skills-full-width{grid-column:1/-1;width:100%;padding:16px 0;border:0;background:transparent;box-sizing:border-box;text-align:center}
-#management .skills-full-width legend{float:none;width:100%;padding:0;text-align:center;font-weight:600}
-#management .skills-full-width .manage-choice-grid{grid-template-columns:minmax(0,1fr);width:100%;gap:10px}
-#management .skills-full-width .manage-choice-grid label{position:relative;justify-content:center;text-align:center;min-height:50px;border:0;box-shadow:none;background:#f3f1f7;color:#51495e;font-weight:500}
-#management .skills-full-width .manage-choice-grid label:has(input:checked){border:0;box-shadow:none;background:var(--accent);color:#fff;font-weight:500}
-#management .skills-full-width .manage-choice-grid label:hover{border:0}
-#management .skills-full-width .manage-choice-grid label:not(:has(input:checked)):hover{background:#eae4f4}
-#management .skills-full-width .manage-choice-grid input[type="checkbox"]{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+#management .management-form fieldset.manage-choice-list{display:block;grid-column:1/-1;min-width:0}
+#management .skills-full-width{width:100%;padding:16px 0;border:0;background:transparent;box-sizing:border-box;text-align:left}
+#management .skills-full-width legend{float:none;width:100%;padding:0;text-align:left;font-weight:600;border:0}
+#management .skills-full-width .manage-choice-help{margin:12px 0 18px}
+#management .skills-full-width .manage-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:12px;margin:0 0 18px}
+#management .skills-full-width .manage-choice-grid label{position:relative;justify-content:flex-start;text-align:left;min-height:58px;padding:16px;border:1px solid #e1d9ef;border-radius:15px;box-shadow:none;background:#fff;color:var(--ink);font-weight:600}
+#management .skills-full-width .manage-choice-grid label:has(input:checked){border-color:var(--accent);box-shadow:none;background:#f2ebff;color:var(--accent);font-weight:600}
+#management .skills-full-width .manage-choice-grid label:not(:has(input:checked)):hover{background:#faf7ff;border-color:#baa5df}
+#management .skills-full-width .manage-choice-grid input[type="checkbox"]{position:static;flex:0 0 20px;width:20px;height:20px;clip-path:none;overflow:visible;padding:0;margin:0;accent-color:var(--accent)}
 #management .skills-full-width .manage-choice-grid label:focus-within{outline:none}
 #management .skills-full-width .manage-choice-grid label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
+@media(max-width:380px){#management .skills-full-width .manage-choice-grid{grid-template-columns:1fr}}
 `;document.head.append(optionStyle);
 if($('managementForm'))setupSimpleOpportunity();
 </script>
