@@ -169,7 +169,7 @@ dialog{border:0;padding:0;color:var(--ink);background:white;border-radius:18px;m
   <div class="photo-stage" id="photoStage"><img id="photoImage" alt=""></div>
   <button class="photo-arrow photo-arrow-prev" id="photoPrev" aria-label="Foto anterior"><svg class="i"><use href="#i-back"/></svg></button>
   <button class="photo-arrow photo-arrow-next" id="photoNext" aria-label="Próxima foto"><svg class="i"><use href="#i-arrow"/></svg></button>
-  <div class="photo-info"><div class="photo-copy"><h2 id="photoTitle"></h2><p id="photoCaption"></p><div class="photo-meta-disclosure" id="photoMetaDisclosure" hidden><div id="photoLocation" class="photo-location" hidden></div><div id="photoTagged" class="photo-tagged" hidden></div></div></div><div class="photo-actions"><button type="button" class="photo-more" id="photoMore" aria-label="Ver cidade e perfis marcados" aria-controls="photoMetaDisclosure" aria-expanded="false" hidden>•••</button></div></div>
+  <div class="photo-info"><div class="photo-copy"><h2 id="photoTitle"></h2><p id="photoCaption"></p><div class="photo-meta-disclosure" id="photoMetaDisclosure" hidden><div id="photoLocation" class="photo-location" hidden></div><div id="photoTagged" class="photo-tagged" hidden></div></div></div><div class="photo-actions"><button type="button" class="photo-more" id="photoMore" aria-label="Ver cidade e perfis marcados" aria-controls="photoMetaDisclosure" aria-expanded="false" hidden>⋮</button></div></div>
  </div>
  <div class="photo-nav"><div class="photo-progress"><span id="photoCount" aria-live="polite"></span><div class="carousel-dots" id="photoDots" aria-label="Escolher foto"></div></div></div>
 </dialog>
@@ -3316,6 +3316,19 @@ window.addEventListener('hashchange',()=>{document.querySelectorAll('dialog[open
 .photo-dialog.photo-clean-view .photo-lightbox-header,.photo-dialog.photo-clean-view .photo-nav,.photo-dialog.photo-clean-view .photo-arrow{display:none!important}
 .photo-dialog.photo-clean-view .photo-post{position:absolute;inset:0}
 .photo-dialog.photo-clean-view .photo-stage{cursor:zoom-in}
+</style>
+
+<style>
+/* Ajustes de enquadramento e ações no smartphone */
+.photo-dialog .photo-actions .photo-more{width:32px;height:32px;min-width:32px;padding:0;border:0;background:rgba(255,255,255,.08);color:rgba(255,255,255,.78);font-size:1.25rem;font-weight:500;letter-spacing:0;opacity:.72}
+.photo-dialog .photo-actions .photo-more:hover,.photo-dialog .photo-actions .photo-more:focus-visible{background:rgba(255,255,255,.14);color:#fff;opacity:1}
+@media(max-width:760px){
+ .photo-dialog .photo-stage{align-items:center!important;justify-content:center!important}
+ .photo-dialog .photo-stage img{width:auto!important;height:auto!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;margin:auto!important}
+ .photo-dialog .photo-actions{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;width:100%;gap:7px}
+ .photo-dialog .photo-actions .btn{flex:1 1 0;min-width:0;width:auto}
+ .photo-dialog .photo-actions .photo-more{flex:0 0 32px}
+}
 </style>
 </body>
 <script>
