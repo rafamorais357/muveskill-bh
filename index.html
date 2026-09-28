@@ -3391,6 +3391,21 @@ window.addEventListener('hashchange',()=>{document.querySelectorAll('dialog[open
  .photo-dialog.photo-portrait-caption.photo-caption-expanded .photo-copy{width:min(760px,100%);max-width:760px;max-height:min(45dvh,520px)}
 }
 </style>
+
+<style id="tablet-landscape-caption-expansion">
+/* Em tablet deitado, a legenda abre para cima e textos curtos mantêm sua largura natural. */
+@media (orientation:landscape) and (min-width:761px) and (max-width:1400px){
+ .photo-dialog.photo-portrait-caption .photo-info{inset:0 0 0 calc(50% + clamp(170px,18vw,275px));align-items:stretch;justify-content:flex-end;padding:clamp(24px,4vh,56px) clamp(24px,4vw,64px);background:linear-gradient(0deg,rgba(8,7,12,.8),rgba(8,7,12,.2) 58%,transparent 100%)}
+ .photo-dialog.photo-portrait-caption .photo-copy{width:100%;max-width:760px;margin:0;display:flex;flex-direction:column;justify-content:flex-end}
+ .photo-dialog.photo-portrait-caption .photo-copy-trigger{width:max-content;max-width:100%;align-self:flex-start}
+ .photo-dialog.photo-portrait-caption.photo-caption-expanded .photo-info{inset:0 0 0 calc(50% + clamp(170px,18vw,275px));align-items:stretch;justify-content:flex-end;padding:clamp(24px,4vh,56px) clamp(24px,4vw,64px);background:linear-gradient(0deg,rgba(8,7,12,.92),rgba(8,7,12,.32) 64%,transparent 100%)}
+ .photo-dialog.photo-portrait-caption.photo-caption-expanded .photo-copy{width:100%;max-width:760px;max-height:min(58dvh,560px);overflow-y:auto;overscroll-behavior:contain}
+ .photo-dialog.photo-portrait-caption.photo-caption-expanded .photo-copy-trigger{width:max-content;max-width:100%}
+}
+@media(min-width:761px){
+ .photo-dialog.photo-portrait-caption .photo-copy-trigger{width:max-content;max-width:100%}
+}
+</style>
 </body>
 <script>
 // Four-step editor: keep existing publishing fields and data contracts.
