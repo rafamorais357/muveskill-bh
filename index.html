@@ -164,9 +164,14 @@ dialog{border:0;padding:0;color:var(--ink);background:white;border-radius:18px;m
 </div>
 <nav class="bottom-nav" id="mobileNav" aria-label="Navegação principal"></nav>
 <dialog class="photo-dialog" id="photoDialog" aria-labelledby="photoTitle">
- <div class="dialog-header"><button class="post-owner" id="photoOwner"></button><button class="icon-btn" onclick="document.getElementById('photoDialog').close()" aria-label="Fechar foto"><svg class="i"><use href="#i-close"/></svg></button></div>
- <div class="photo-post"><div class="photo-stage"><img id="photoImage" alt=""></div><div class="photo-info"><h2 id="photoTitle"></h2><p id="photoCaption"></p><button class="btn btn-secondary" id="photoProfile">Ver perfil</button></div></div>
- <div class="photo-nav"><button class="icon-btn" id="photoPrev" aria-label="Foto anterior"><svg class="i"><use href="#i-back"/></svg></button><div class="photo-progress"><span id="photoCount" aria-live="polite"></span><div class="carousel-dots" id="photoDots" aria-label="Escolher foto"></div></div><button class="icon-btn" id="photoNext" aria-label="Próxima foto"><svg class="i"><use href="#i-arrow"/></svg></button></div>
+ <div class="dialog-header photo-lightbox-header"><button class="post-owner" id="photoOwner"></button><button class="icon-btn photo-close" onclick="document.getElementById('photoDialog').close()" aria-label="Fechar foto"><svg class="i"><use href="#i-close"/></svg></button></div>
+ <div class="photo-post" id="photoPost">
+  <div class="photo-stage" id="photoStage"><img id="photoImage" alt=""></div>
+  <button class="photo-arrow photo-arrow-prev" id="photoPrev" aria-label="Foto anterior"><svg class="i"><use href="#i-back"/></svg></button>
+  <button class="photo-arrow photo-arrow-next" id="photoNext" aria-label="Próxima foto"><svg class="i"><use href="#i-arrow"/></svg></button>
+  <div class="photo-info"><div class="photo-copy"><h2 id="photoTitle"></h2><p id="photoCaption"></p><div id="photoLocation" class="photo-location" hidden></div><div id="photoTagged" class="photo-tagged" hidden></div></div><div class="photo-actions"><button class="btn btn-secondary" id="photoProfile">Ver perfil</button></div></div>
+ </div>
+ <div class="photo-nav"><div class="photo-progress"><span id="photoCount" aria-live="polite"></span><div class="carousel-dots" id="photoDots" aria-label="Escolher foto"></div></div></div>
 </dialog>
 <dialog class="photo-upload-dialog" id="photoUploadDialog" aria-labelledby="photoUploadTitle"></dialog>
 <dialog class="application-dialog" id="notificationDialog" aria-labelledby="notificationTitle"></dialog>
@@ -3195,7 +3200,7 @@ function missionCard(m){const p=profiles[m.profile];return `<article class="miss
 function setMissionFilter(skill){missionFilter=skill;renderMissions()}
 function renderMissions(){$('missionFilters').innerHTML=['Todas',...skills].map(s=>`<button class="skill-chip ${missionFilter===s?'active':''}" aria-pressed="${missionFilter===s}" onclick="setMissionFilter('${s}')">${s}</button>`).join('');const list=missions.filter(m=>missionIsActive(m)).sort(newestFirst).filter(m=>missionFilter==='Todas'||(m.skill==='Foto'?'Fotografia':m.skill)===missionFilter);$('missionCount').textContent=`${list.length} ${list.length===1?'opção':'opções'}`;$('missionList').innerHTML=list.map(missionCard).join('')||'<div class="empty"><p>Nenhuma oportunidade nessa categoria.</p></div>'}
 function openPhoto(id,index,collection='gallery'){const p=profiles[id];if(!p)return;photoProfileId=id;photoSequence=collection==='highlights'?highlightIndices(p):p.photos.map((_,i)=>i);if(!photoSequence.length)return;photoIndex=Math.max(0,photoSequence.indexOf(index));renderPhoto();if(!$('photoDialog').open)$('photoDialog').showModal()}
-function renderPhoto(){const p=profiles[photoProfileId],photo=p.photos[photoSequence[photoIndex]];if(!photo)return;$('photoOwner').innerHTML=image(avatarSource(p),'','mini-avatar',false)+`<span><strong>${esc(p.handle)}</strong><small>${esc(p.city)}</small></span>`;$('photoOwner').onclick=()=>openProfile(photoProfileId);$('photoImage').src=photo[0];$('photoImage').alt=photo[1];$('photoTitle').textContent=photo[1];$('photoCaption').textContent=photo[2]||'';const info=$('photoCaption').parentElement;info.querySelectorAll('.photo-location,.photo-tagged').forEach(el=>el.remove());const meta=photo[3]&&typeof photo[3]==='object'?photo[3]:{};let infoAnchor=$('photoCaption');if(meta.location){const loc=document.createElement('div');loc.className='photo-location';loc.innerHTML=icon('pin')+'<span>'+esc(meta.location)+'</span>';infoAnchor.insertAdjacentElement('afterend',loc);infoAnchor=loc}const taggedIds=Array.isArray(meta.taggedProfileIds)?meta.taggedProfileIds.filter(id=>profiles[id]):[];if(taggedIds.length){const tags=document.createElement('div');tags.className='photo-tagged';tags.innerHTML=taggedIds.map(id=>`<button onclick="document.getElementById('photoDialog').close();openProfile('${id}')">${esc(profiles[id].handle)}</button>`).join('');infoAnchor.insertAdjacentElement('afterend',tags)}$('photoCount').textContent=`${photoIndex+1} de ${photoSequence.length}`;$('photoPrev').disabled=photoIndex===0;$('photoNext').disabled=photoIndex===photoSequence.length-1;$('photoProfile').onclick=()=>openProfile(photoProfileId);let deleteButton=$('photoDelete'),editButton=$('photoEdit');if(photoProfileId===CURRENT_USER_ID&&authUser){if(!editButton){editButton=document.createElement('button');editButton.id='photoEdit';editButton.className='btn btn-secondary';editButton.textContent='Editar foto';$('photoProfile').insertAdjacentElement('afterend',editButton)}if(!deleteButton){deleteButton=document.createElement('button');deleteButton.id='photoDelete';deleteButton.className='btn btn-danger';deleteButton.textContent='Excluir foto';editButton.insertAdjacentElement('afterend',deleteButton)}editButton.hidden=false;deleteButton.hidden=false;editButton.onclick=openCurrentPhotoEditor;deleteButton.onclick=deleteCurrentPhoto}else{if(editButton)editButton.hidden=true;if(deleteButton)deleteButton.hidden=true}$('photoDots').innerHTML=photoSequence.map((_,i)=>`<button class="carousel-dot ${i===photoIndex?'active':''}" aria-label="Ver foto ${i+1}" aria-pressed="${i===photoIndex}" onclick="photoAt(${i})"></button>`).join('')}
+function renderPhoto(){const p=profiles[photoProfileId],photo=p.photos[photoSequence[photoIndex]];if(!photo)return;$('photoOwner').innerHTML=image(avatarSource(p),'','mini-avatar',false)+`<span><strong>${esc(p.handle)}</strong>${p.city?`<small>${esc(p.city)}</small>`:''}</span>`;$('photoOwner').onclick=()=>openProfile(photoProfileId);$('photoImage').src=photo[0];$('photoImage').alt=photo[1];$('photoTitle').textContent=photo[1];$('photoCaption').textContent=photo[2]||'';const meta=photo[3]&&typeof photo[3]==='object'?photo[3]:{},location=$('photoLocation'),tagged=$('photoTagged');location.innerHTML=meta.location?icon('pin')+'<span>'+esc(meta.location)+'</span>':'';location.hidden=!meta.location;const taggedIds=Array.isArray(meta.taggedProfileIds)?meta.taggedProfileIds.filter(id=>profiles[id]):[];tagged.innerHTML=taggedIds.map(id=>`<button onclick="document.getElementById('photoDialog').close();openProfile('${id}')">${esc(profiles[id].handle)}</button>`).join('');tagged.hidden=!taggedIds.length;$('photoCount').textContent=`${photoIndex+1} de ${photoSequence.length}`;$('photoPrev').disabled=photoIndex===0;$('photoNext').disabled=photoIndex===photoSequence.length-1;$('photoProfile').onclick=()=>openProfile(photoProfileId);let deleteButton=$('photoDelete'),editButton=$('photoEdit');if(photoProfileId===CURRENT_USER_ID&&authUser){if(!editButton){editButton=document.createElement('button');editButton.id='photoEdit';editButton.className='btn btn-secondary';editButton.textContent='Editar foto';$('photoProfile').insertAdjacentElement('afterend',editButton)}if(!deleteButton){deleteButton=document.createElement('button');deleteButton.id='photoDelete';deleteButton.className='btn btn-danger';deleteButton.textContent='Excluir foto';editButton.insertAdjacentElement('afterend',deleteButton)}editButton.hidden=false;deleteButton.hidden=false;editButton.onclick=openCurrentPhotoEditor;deleteButton.onclick=deleteCurrentPhoto}else{if(editButton)editButton.hidden=true;if(deleteButton)deleteButton.hidden=true}$('photoDots').innerHTML=photoSequence.map((_,i)=>`<button class="carousel-dot ${i===photoIndex?'active':''}" aria-label="Ver foto ${i+1}" aria-pressed="${i===photoIndex}" onclick="photoAt(${i})"></button>`).join('')}
 
 function currentOwnedPhoto(){if(!authUser||photoProfileId!==CURRENT_USER_ID)return null;const p=profiles[CURRENT_USER_ID],index=photoSequence[photoIndex],photo=p?.photos?.[index];return photo?{p,index,photo}:null}
 function openCurrentPhotoEditor(){const current=currentOwnedPhoto();if(!current)return;const {photo}=current,meta=photo[3]&&typeof photo[3]==='object'?photo[3]:{},taggedIds=Array.isArray(meta.taggedProfileIds)?meta.taggedProfileIds.filter(id=>profiles[id]):[],d=$('photoUploadDialog');d.innerHTML=`<div class="dialog-header"><strong id="photoUploadTitle">Editar foto</strong><button class="icon-btn" onclick="closePhotoEditDialog()" aria-label="Fechar edição">${icon('close')}</button></div><div class="photo-upload-body"><div class="photo-edit-preview">${image(photo[0],photo[1])}</div><div class="photo-meta-grid"><label>Título da imagem<input id="editGalleryTitle" maxlength="100" value="${esc(photo[1]||'')}" placeholder="Ex.: Luz da manhã na Serra"></label><label>Descrição<textarea id="editGalleryCaption" maxlength="500" placeholder="Conte a história, o contexto ou os detalhes desta imagem...">${esc(photo[2]||'')}</textarea></label><label>Cidade onde a foto foi feita<input id="editGalleryLocation" list="editGalleryCityOptions" maxlength="100" value="${esc(meta.location||'')}" autocomplete="off" placeholder="Ex.: Belo Horizonte, MG"><datalist id="editGalleryCityOptions"></datalist></label><label>Marcar um perfil<input id="editGalleryTag" list="editGalleryTagOptions" value="${esc(taggedIds.length?profiles[taggedIds[0]].handle:'')}" placeholder="Ex.: @pousadax"><datalist id="editGalleryTagOptions">${taggableProfiles().map(([id,p])=>`<option value="${esc(p.handle)}">${esc(p.name)}</option>`).join('')}</datalist></label></div><div class="photo-upload-actions"><button class="btn btn-quiet" type="button" onclick="closePhotoEditDialog()">Cancelar</button><button class="btn btn-primary" type="button" onclick="saveCurrentPhotoEdits()">Salvar alterações</button></div></div>`;renderPhotoCityOptions();void loadTravelerCities();if($('photoDialog')?.open)$('photoDialog').close();if(!d.open)d.showModal()}
@@ -3229,7 +3234,7 @@ window.addEventListener('focus',async()=>{if(authUser&&supabaseClient){await hyd
 
 loadPersistedState();loadHighlightPreference();
 refreshChrome();
-bindExploreSearch();$('photoPrev').onclick=()=>stepPhoto(-1);$('photoNext').onclick=()=>stepPhoto(1);
+bindExploreSearch();$('photoPrev').onclick=()=>stepPhoto(-1);$('photoNext').onclick=()=>stepPhoto(1);$('photoDialog').addEventListener('click',event=>{const target=event.target;if(target===$('photoDialog')||target===$('photoPost')||target===$('photoStage')||target.classList?.contains('photo-lightbox-header')||target.classList?.contains('photo-info')||target.classList?.contains('photo-nav'))$('photoDialog').close()});
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close()}}));
 document.addEventListener('keydown',event=>{if($('photoDialog').open){if(event.key==='ArrowLeft'){event.preventDefault();stepPhoto(-1)}if(event.key==='ArrowRight'){event.preventDefault();stepPhoto(1)}}else if(event.target.matches('.profile-tab')){const tabs=[...document.querySelectorAll('.profile-tab')],index=tabs.indexOf(event.target);let next=null;if(event.key==='ArrowRight')next=(index+1)%tabs.length;if(event.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;if(event.key==='Home')next=0;if(event.key==='End')next=tabs.length-1;if(next!==null){event.preventDefault();setProfileTab(tabs[next].id.replace('tab-',''));tabs[next].focus()}}});
 
@@ -3243,6 +3248,61 @@ function setupSidebarScrollIsolation(){const sidebar=document.querySelector('.si
 setupSidebarScrollIsolation();
 window.addEventListener('hashchange',()=>{document.querySelectorAll('dialog[open]').forEach(d=>d.close());renderRoute()});renderHome();renderRoute();initAuth();
 </script>
+
+<style>
+/* Foto em destaque: visualização imersiva responsiva */
+.photo-dialog{position:fixed;inset:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;padding:0;border-radius:0;overflow:hidden;background:#08070c;color:#fff;box-shadow:none}
+.photo-dialog[open]{display:flex;flex-direction:column}
+.photo-dialog::backdrop{background:rgba(8,7,12,.94);backdrop-filter:blur(7px)}
+.photo-dialog .photo-lightbox-header{position:relative;inset:auto;z-index:5;flex:none;height:72px;padding:10px clamp(14px,3vw,36px);background:rgba(8,7,12,.82);border:0;color:#fff}
+.photo-dialog .post-owner{width:auto;min-width:0;padding:5px 0;color:#fff}
+.photo-dialog .post-owner strong{color:#fff;font-size:.9rem}
+.photo-dialog .post-owner small{color:rgba(255,255,255,.68)}
+.photo-dialog .post-owner .mini-avatar{width:40px;height:40px}
+.photo-dialog .photo-close{color:#fff;border-radius:50%;background:rgba(255,255,255,.1)}
+.photo-dialog .photo-post{position:relative;display:block;flex:1;min-height:0;background:#08070c;overflow:hidden}
+.photo-dialog .photo-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;min-height:0;background:#08070c;cursor:zoom-out}
+.photo-dialog .photo-stage img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;cursor:default}
+.photo-dialog .photo-info{position:absolute;z-index:2;inset:auto 0 0;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:100px clamp(20px,5vw,72px) 24px;background:linear-gradient(180deg,transparent 0%,rgba(8,7,12,.9) 78%);color:#fff;pointer-events:none}
+.photo-dialog .photo-copy{min-width:0;max-width:min(760px,72vw);pointer-events:auto}
+.photo-dialog .photo-copy h2{font-size:clamp(1.1rem,2vw,1.45rem);margin:0 0 7px;color:#fff}
+.photo-dialog .photo-copy p{margin:0;color:rgba(255,255,255,.9);font-size:.95rem;line-height:1.55;white-space:pre-wrap}
+.photo-dialog .photo-copy p:empty{display:none}
+.photo-dialog .photo-location{display:flex;align-items:center;gap:6px;margin:10px 0 0;color:rgba(255,255,255,.82);font-size:.84rem}
+.photo-dialog .photo-location[hidden],.photo-dialog .photo-tagged[hidden]{display:none}
+.photo-dialog .photo-tagged{display:flex;flex-wrap:wrap;gap:7px;margin:9px 0 0}
+.photo-dialog .photo-tagged button{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:7px 10px;font-size:.78rem;font-weight:800}
+.photo-dialog .photo-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;flex:none;pointer-events:auto}
+.photo-dialog .photo-actions .btn{margin:0!important;min-width:120px;min-height:44px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff}
+.photo-dialog .photo-actions .btn-danger{background:rgba(173,44,55,.35);border-color:rgba(255,140,150,.45)}
+.photo-dialog .photo-arrow{position:absolute;z-index:4;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:48px;height:48px;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(15,13,20,.48);color:#fff;backdrop-filter:blur(8px)}
+.photo-dialog .photo-arrow:hover:not(:disabled){background:rgba(255,255,255,.2)}
+.photo-dialog .photo-arrow:disabled{opacity:.32}
+.photo-dialog .photo-arrow .i{width:22px;height:22px}
+.photo-dialog .photo-arrow-prev{left:clamp(12px,2.5vw,32px)}
+.photo-dialog .photo-arrow-next{right:clamp(12px,2.5vw,32px)}
+.photo-dialog .photo-nav{position:relative;z-index:5;flex:none;height:45px;display:flex;align-items:center;justify-content:center;padding:0 12px 7px;border:0;background:#08070c;color:#fff}
+.photo-dialog .photo-progress{display:grid;justify-items:center;gap:4px;color:rgba(255,255,255,.74);font-size:.76rem}
+.photo-dialog .carousel-dots{display:flex;align-items:center;gap:6px}
+.photo-dialog .carousel-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.36)}
+.photo-dialog .carousel-dot.active{width:18px;border-radius:999px;background:#a78bfa}
+@media(max-width:760px){
+ .photo-dialog .photo-lightbox-header{height:62px;padding:8px 14px}
+ .photo-dialog .post-owner .mini-avatar{width:36px;height:36px}
+ .photo-dialog .photo-info{display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:78px 17px 15px;background:linear-gradient(180deg,transparent 0%,rgba(8,7,12,.92) 42%)}
+ .photo-dialog .photo-copy{max-width:none}
+ .photo-dialog .photo-copy h2{font-size:1.08rem}
+ .photo-dialog .photo-copy p{font-size:.88rem;line-height:1.45;max-height:5.2em;overflow:auto}
+ .photo-dialog .photo-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));width:100%;gap:7px}
+ .photo-dialog .photo-actions .btn{min-width:0;width:100%;min-height:42px;padding:9px 10px;font-size:.82rem}
+ .photo-dialog .photo-arrow{width:40px;height:40px}
+ .photo-dialog .photo-arrow .i{width:19px;height:19px}
+ .photo-dialog .photo-arrow-prev{left:9px}
+ .photo-dialog .photo-arrow-next{right:9px}
+ .photo-dialog .photo-nav{height:42px;padding-bottom:5px}
+}
+@media(max-width:390px){.photo-dialog .post-owner strong{font-size:.82rem}.photo-dialog .photo-info{padding-left:13px;padding-right:13px}.photo-dialog .photo-actions{grid-template-columns:1fr 1fr}.photo-dialog .photo-actions .btn{font-size:.77rem;padding:8px 6px}}
+</style>
 </body>
 <script>
 // Four-step editor: keep existing publishing fields and data contracts.
