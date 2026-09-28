@@ -3330,6 +3330,15 @@ window.addEventListener('hashchange',()=>{document.querySelectorAll('dialog[open
  .photo-dialog .photo-actions .photo-more{flex:0 0 32px}
 }
 </style>
+
+<style>
+/* Centralização exata da imagem no espaço total do celular */
+@media(max-width:760px){
+ .photo-dialog .photo-post{overflow:visible}
+ .photo-dialog .photo-stage{inset:-62px 0 -42px}
+ .photo-dialog .photo-stage img{max-width:100vw!important;max-height:calc(100dvh - 130px)!important;object-position:50% 50%!important}
+}
+</style>
 </body>
 <script>
 // Four-step editor: keep existing publishing fields and data contracts.
