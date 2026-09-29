@@ -3659,8 +3659,9 @@ function setupSimpleOpportunity(){
   queueMicrotask(()=>{if(!form.isConnected)return;form.getBoundingClientRect();if(window.scrollY!==y||window.scrollX!==x)window.scrollTo({left:x,top:y,behavior:'instant'});});
  },true);
  const intro=document.querySelector('.management-intro p');if(intro)intro.textContent='Preencha os detalhes da oportunidade e revise tudo antes de publicar. Seu rascunho e as fotos ficam salvos neste navegador. Ao publicar, as fotos são enviadas para a oportunidade.';
- form.addEventListener('input',()=>{syncSimpleOpportunity();saveOpportunityDraft(form);});
- form.addEventListener('change',()=>{syncSimpleOpportunity();saveOpportunityDraft(form);});
+ const updateDatesFromInput=event=>{if(['manage-projectDays','manage-startDate'].includes(event.target?.id)||event.target?.id==='simpleDateMode'&&event.target.value==='dates')updateSimpleEndDate();syncSimpleOpportunity();saveOpportunityDraft(form);};
+ form.addEventListener('input',updateDatesFromInput);
+ form.addEventListener('change',updateDatesFromInput);
  // Put the introduction first, preserving all fields and their handlers.
  const initial=steps[2],titleField=$('manage-missionTitle').closest('.manage-field'),summaryField=$('manage-missionDescription').closest('.manage-field');
  initial.querySelector('.wizard-step-copy').textContent='Comece com o título e um breve resumo. Depois, selecione as habilidades que procura.';
@@ -3668,8 +3669,9 @@ function setupSimpleOpportunity(){
  steps[3].append(extra);
  [steps[2],steps[1],steps[0],steps[3],steps[4]].forEach((box,i)=>{box.dataset.step=i;form.insertBefore(box,summary);});
  if(summary)summary.remove();
- syncSimpleOpportunity();updateManagementSteps();$('wizardPublish').textContent=managementMissionId?'Salvar alterações':'Criar oportunidade';
+ updateSimpleEndDate();syncSimpleOpportunity();updateManagementSteps();$('wizardPublish').textContent=managementMissionId?'Salvar alterações':'Criar oportunidade';
 }
+function updateSimpleEndDate(){const mode=$('simpleDateMode')?.value,startValue=$('manage-startDate')?.value,rawDays=Number($('manage-projectDays')?.value),endField=$('manage-endDate');if(mode!=='dates'||!startValue||!endField||!Number.isFinite(rawDays)||rawDays<1)return;const date=new Date(startValue+'T00:00:00Z');if(Number.isNaN(date.getTime()))return;date.setUTCDate(date.getUTCDate()+Math.round(rawDays));endField.value=date.toISOString().slice(0,10);}
 function syncSimpleOpportunity(){
  const form=$('managementForm');if(!form||!$('simpleDateMode'))return;
  const get=n=>$('manage-'+n),model=get('exchangeType').value,paid=model!=='Permuta';
@@ -3945,4 +3947,7 @@ if($('managementForm'))setupSimpleOpportunity();
 /* Form choices and password visibility controls also focus inward. */
 .auth-role-card:has(input:focus-visible) .auth-role-card-inner{outline:none!important;outline-offset:0!important;box-shadow:inset 0 0 0 2px #b895eb!important}
 .auth-password-toggle:focus-visible,#management .manage-choice-grid>.btn:focus-visible{outline:none!important;outline-offset:0!important;box-shadow:inset 0 0 0 2px var(--accent)!important}
+
+/* Show the dropdown cue consistently on every single-choice field. */
+select:not([multiple]){appearance:none!important;-webkit-appearance:none!important;-moz-appearance:none!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236b6b76' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 7 5 6 5-6'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 15px center!important;background-size:18px 18px!important;padding-right:44px!important;cursor:pointer}
 </style>
