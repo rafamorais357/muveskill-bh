@@ -3920,8 +3920,10 @@ if($('managementForm'))setupSimpleOpportunity();
 
 <style>.experience-dates{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line);color:var(--muted);font-size:.875rem}.experience-dates span{display:flex;gap:6px;align-items:baseline}.experience-dates strong{color:var(--ink)}</style>
 <style id="auth-spacing-and-focus-fix">
-/* Keep password fields aligned with the more spacious profile form. */
+/* Standard gap between auth field labels and their inputs. */
+.auth-form > div:not(.auth-handle-field),.auth-form .auth-handle-field{display:grid;gap:8px}
+/* Keep a consistent distance between e-mail and password fields. */
 .auth-form > * + .auth-password-field{margin-top:8px}
-/* One visible focus ring, without the extra purple halo. */
-.auth-form :is(input,select):focus{box-shadow:none}
+/* The inner border is the only focus indicator. */
+.auth-form :is(input,select):focus,.auth-form :is(input,select):focus-visible{outline:none!important;outline-offset:0!important;box-shadow:none!important;border-color:var(--accent)}
 </style>
