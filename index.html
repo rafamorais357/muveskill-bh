@@ -3431,6 +3431,13 @@ window.addEventListener('hashchange',()=>{document.querySelectorAll('dialog[open
 .photo-dialog:not(.photo-caption-expanded) .photo-copy-trigger{transition:none!important;opacity:.62}
 .photo-dialog.photo-caption-expanded .photo-copy-trigger{transition:none!important;opacity:1;color:#fff}
 </style>
+
+<style id="hard-cut-photo-caption-opacity">
+/* A legenda alterna imediatamente; o estado :active não suaviza a mudança. */
+.photo-dialog #photoMetaToggle,.photo-dialog #photoMetaToggle *{transition-property:none!important;transition-duration:0s!important;animation:none!important}
+.photo-dialog:not(.photo-caption-expanded) #photoMetaToggle,.photo-dialog:not(.photo-caption-expanded) #photoMetaToggle:active{opacity:.62!important;color:inherit!important}
+.photo-dialog.photo-caption-expanded #photoMetaToggle,.photo-dialog.photo-caption-expanded #photoMetaToggle:active{opacity:1!important;color:#fff!important}
+</style>
 </body>
 <script>
 // Four-step editor: keep existing publishing fields and data contracts.
