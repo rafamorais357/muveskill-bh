@@ -3924,6 +3924,10 @@ if($('managementForm'))setupSimpleOpportunity();
 .auth-form > div:not(.auth-handle-field),.auth-form .auth-handle-field{display:grid;gap:8px}
 /* Keep a consistent distance between e-mail and password fields. */
 .auth-form > * + .auth-password-field{margin-top:8px}
-/* The inner border is the only focus indicator. */
-.auth-form :is(input,select):focus,.auth-form :is(input,select):focus-visible{outline:none!important;outline-offset:0!important;box-shadow:none!important;border-color:var(--accent)}
+/* Every text-like form control uses one inner border, with no outside ring. */
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select):focus,
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select):focus-visible{outline:none!important;outline-offset:0!important;box-shadow:none!important;border-color:var(--accent)!important}
+/* Form choices and password visibility controls also focus inward. */
+.auth-role-card:has(input:focus-visible) .auth-role-card-inner{outline:none!important;outline-offset:0!important;box-shadow:inset 0 0 0 2px #b895eb!important}
+.auth-password-toggle:focus-visible,#management .manage-choice-grid>.btn:focus-visible{outline:none!important;outline-offset:0!important;box-shadow:inset 0 0 0 2px var(--accent)!important}
 </style>
