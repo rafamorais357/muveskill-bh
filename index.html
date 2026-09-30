@@ -130,6 +130,17 @@ dialog{border:0;padding:0;color:var(--ink);background:white;border-radius:18px;m
 @media(prefers-reduced-motion:reduce){.auth-role-card-inner{transition:none}}
 </style>
 
+<style id="photo-profile-consistency">
+/* Photo fields follow the profile editor; labels must not bold their controls. */
+.photo-upload-dialog{width:640px;max-width:calc(100vw - 28px);font-family:Manrope,system-ui,-apple-system,sans-serif}
+.photo-upload-body{padding:24px;gap:24px}
+.photo-meta-grid{gap:24px}
+.photo-meta-grid>label{gap:9px;min-width:0}
+.photo-autocomplete-results{font-weight:400;line-height:normal;color:var(--ink)}
+.photo-autocomplete-results button{font-family:inherit;font-weight:400;line-height:normal}
+.photo-autocomplete-results small{font-weight:400}
+@media(max-width:600px){.photo-upload-body{padding:20px}.photo-meta-grid{gap:20px}}
+</style>
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -3791,17 +3802,17 @@ if($('managementForm'))setupSimpleOpportunity();
 #management .wizard-step-copy{margin:0 0 4px;font-size:.875rem;line-height:1.65;color:#656172}
 #management .manage-field,.profile-field,.application-field{gap:9px;min-width:0}
 #management .manage-field>label,.profile-field>label,.auth-form label,#applicationForm label{font-size:.9375rem;font-weight:800;line-height:1.5;color:#292334;margin:0;display:block}
-#management .manage-field :is(input,textarea,select),.profile-field :is(input,textarea,select),
+#management .manage-field :is(input,textarea,select),.profile-field :is(input,textarea,select),.photo-meta-grid :is(input,textarea,select),
 .auth-form :is(input,select),#applicationForm :is(input,textarea){
  box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:52px;padding:14px 15px;
  border:1px solid #e3dfea;border-radius:13px;background:#f5f3f8;color:#292334;
  font-family:inherit;font-size:16px;line-height:1.5;font-weight:500;
  transition:background-color .15s,border-color .15s,box-shadow .15s;
 }
-#management .manage-field textarea,.profile-field textarea,#applicationForm textarea{min-height:124px;resize:vertical}
-#management .manage-field :is(input,textarea)::placeholder,.profile-field :is(input,textarea)::placeholder,
+#management .manage-field textarea,.profile-field textarea,.photo-meta-grid textarea,#applicationForm textarea{min-height:124px;resize:vertical}
+#management .manage-field :is(input,textarea)::placeholder,.profile-field :is(input,textarea)::placeholder,.photo-meta-grid :is(input,textarea)::placeholder,
 .auth-form input::placeholder,#applicationForm textarea::placeholder{color:#777182;opacity:1;font-weight:400}
-#management .manage-field :is(input,textarea,select):focus,.profile-field :is(input,textarea,select):focus,
+#management .manage-field :is(input,textarea,select):focus,.profile-field :is(input,textarea,select):focus,.photo-meta-grid :is(input,textarea,select):focus,
 .auth-form :is(input,select):focus,#applicationForm :is(input,textarea):focus{background:#fff;border-color:var(--accent);outline:2px solid #d9c8f7;outline-offset:2px;box-shadow:0 0 0 4px #f4eefc}
 #management .manage-field select:focus,#management .manage-field select:focus-visible,.profile-field select:focus,.profile-field select:focus-visible,.auth-form select:focus,.auth-form select:focus-visible{outline:none!important;box-shadow:none!important;border-color:#dcdce4;background-color:#fff}
 #management .manage-field input[readonly]{background:#eeebf3;color:#656172}
