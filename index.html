@@ -2868,8 +2868,8 @@ const icon=name=>`<svg class="i" aria-hidden="true"><use href="#i-${name}"/></sv
 const image=(src,alt,cls='',lazy=true)=>`<img src="${esc(src)}" alt="${esc(alt)}" class="${cls}" ${lazy?'loading="lazy"':''} decoding="async">`;
 const avatarSource=p=>p.avatar||p.cover;
 const normalize=value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-// One catalog for profile talents and opportunity skills. Keep the opportunity base first.
-const TALENT_OPTIONS=Object.freeze(["Fotografia", "Vídeo", "Cozinha", "Recepção", "Limpeza", "Manutenção", "Pintura", "Jardinagem", "Massagista", "Barista", "Bartender", "Guia turístico", "Redes sociais", "Eventos e atividades", "Yoga e terapias", "Ensino de idiomas", "Arte", "Muralismo", "Marketing digital", "Edição de vídeo", "Design gráfico", "Redação", "Tradução", "Atendimento", "Confeitaria", "Organização", "Horta", "Marcenaria", "Música", "Tecnologia"]);
+// One catalog for profile talents and opportunity skills, ordered by related activities.
+const TALENT_OPTIONS=Object.freeze(["Fotografia", "Vídeo", "Edição de vídeo", "Design gráfico", "Redes sociais", "Marketing digital", "Redação", "Tecnologia", "Arte", "Muralismo", "Pintura", "Cozinha", "Confeitaria", "Barista", "Bartender", "Recepção", "Atendimento", "Organização", "Limpeza", "Manutenção", "Marcenaria", "Jardinagem", "Horta", "Música", "Eventos e atividades", "Guia turístico", "Yoga e terapias", "Massagista", "Ensino de idiomas", "Tradução"]);
 const TALENT_ALIASES={"Foto": ["Fotografia"], "Culinária": ["Cozinha"], "Organização de eventos": ["Eventos e atividades"], "Yoga": ["Yoga e terapias"], "Aulas de idiomas": ["Ensino de idiomas"], "Arte e muralismo": ["Arte", "Muralismo"]};
 function normalizeTalentSelection(values){return [...new Set((Array.isArray(values)?values:[]).flatMap(value=>{const text=String(value||" ").trim();return text?(TALENT_ALIASES[text]||[text]):[]}))]}
 const skills=['Fotografia','Cozinha','Manutenção','Pintura','Arte','Recepção'];
